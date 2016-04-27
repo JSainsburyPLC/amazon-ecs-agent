@@ -103,6 +103,10 @@ type Config struct {
 	// TaskCleanupWaitDuration specifies the time to wait after a task is stopped
 	// until cleanup of task resources is started.
 	TaskCleanupWaitDuration time.Duration
+
+	// PrivateIp specifies the private ip of the host running the ecs agent client
+	// it is mapped to host.internal in the docker containers host file
+	PrivateIp string `trim:"true"`
 }
 
 // SensitiveRawMessage is a struct to store some data that should not be logged

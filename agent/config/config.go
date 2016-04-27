@@ -198,6 +198,7 @@ func environmentConfig() Config {
 
 	clusterRef := os.Getenv("ECS_CLUSTER")
 	awsRegion := os.Getenv("AWS_DEFAULT_REGION")
+	privateIp := os.Getenv("PRIVATE_IP")
 
 	dockerEndpoint := os.Getenv("DOCKER_HOST")
 	engineAuthType := os.Getenv("ECS_ENGINE_AUTH_TYPE")
@@ -282,6 +283,7 @@ func environmentConfig() Config {
 		SELinuxCapable:          seLinuxCapable,
 		AppArmorCapable:         appArmorCapable,
 		TaskCleanupWaitDuration: taskCleanupWaitDuration,
+		PrivateIp:				 privateIp,
 	}
 }
 
@@ -320,7 +322,7 @@ func ec2MetadataConfig(ec2client ec2.EC2MetadataClient) Config {
 		log.Crit("Unable to communicate with EC2 Metadata service to infer region: " + err.Error())
 		return Config{}
 	}
-	return Config{AWSRegion: iid.Region}
+	return Config{AWSRegion: iid.Region, PrivateIp: iid.PrivateIp}
 }
 
 // NewConfig returns a config struct created by merging environment variables,
@@ -344,7 +346,7 @@ func NewConfig(ec2client ec2.EC2MetadataClient) (config *Config, err error) {
 
 	config.Merge(fileConfig())
 
-	if config.AWSRegion == "" {
+	if config.AWSRegion == "" || config.PrivateIp == "" {
 		// Get it from metadata only if we need to (network io)
 		config.Merge(ec2MetadataConfig(ec2client))
 	}

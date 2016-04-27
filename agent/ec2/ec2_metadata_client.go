@@ -57,7 +57,7 @@ type InstanceIdentityDocument struct {
 	InstanceId       string  `json:"instanceId"`
 	InstanceType     string  `json:"instanceType"`
 	Region           string  `json:"region"`
-	PrivateIp        *string `json:"privateIp"`
+	PrivateIp        string  `json:"privateIp"`
 	AvailabilityZone string  `json:"availabilityZone"`
 }
 

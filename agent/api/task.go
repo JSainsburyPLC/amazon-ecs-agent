@@ -18,12 +18,14 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"fmt"
 
 	"github.com/aws/amazon-ecs-agent/agent/acs/model/ecsacs"
 	"github.com/aws/amazon-ecs-agent/agent/engine/emptyvolume"
 	"github.com/aws/amazon-ecs-agent/agent/utils/ttime"
 	"github.com/aws/aws-sdk-go/private/protocol/json/jsonutil"
 	"github.com/fsouza/go-dockerclient"
+	"github.com/aws/amazon-ecs-agent/agent/config"
 )
 
 const emptyHostVolumeName = "~internal~ecs-emptyvolume-source"
@@ -206,6 +208,9 @@ func (task *Task) dockerConfig(container *Container) (*docker.Config, *DockerCli
 		dockerMem = DOCKER_MINIMUM_MEMORY
 	}
 
+    // Create the host file entry adding the ecs agents host private ip
+	dockerExtraHosts := fmt.Sprintf("host.internal=%s", config.PrivateIp)
+
 	var entryPoint []string
 	if container.EntryPoint != nil {
 		entryPoint = *container.EntryPoint
@@ -220,6 +225,7 @@ func (task *Task) dockerConfig(container *Container) (*docker.Config, *DockerCli
 		Env:          dockerEnv,
 		Memory:       dockerMem,
 		CPUShares:    task.dockerCpuShares(container.Cpu),
+		ExtraHosts:   dockerExtraHosts,
 	}
 
 	if container.DockerConfig.Config != nil {
